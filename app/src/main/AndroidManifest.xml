@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Casinoisrael">
         <activity
+            android:name=".ActivityGames"
+            android:exported="false" />
+        <activity
             android:name=".BoardGame"
             android:exported="false" />
         <activity
