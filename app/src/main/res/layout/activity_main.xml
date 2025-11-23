@@ -8,17 +8,28 @@
     android:orientation="vertical"
     android:gravity="center"
     tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="welcome to amit casino"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button"
         android:text="start"
-        ></Button>
+        app:backgroundTint="#FF0000"
+        />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/score_board_button"
         android:text="Score Board"
-        ></Button>
+        app:backgroundTint="#FF0000"
+        />
 
 </LinearLayout>
