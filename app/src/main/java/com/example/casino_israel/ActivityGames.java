@@ -22,6 +22,11 @@ private boolean check;
 
            setContentView(blackjack);
        }
+       if(check==false)
+       {
+           roulette roulette = new roulette(this);
+           setContentView(roulette);
+       }
        
        
     }
