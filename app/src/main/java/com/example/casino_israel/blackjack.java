@@ -1,5 +1,6 @@
 package com.example.casino_israel;
 
+import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,20 +18,41 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class blackjack extends View {
+
+    // Inner class to hold information about each card circle
+    private class CardCircle {
+        PointF position;
+        int cardNumber;
+
+        CardCircle(PointF position, int cardNumber) {
+            this.position = position;
+            this.cardNumber = cardNumber;
+        }
+        public int getCardNumber() {
+            return cardNumber;
+        }
+    }
+
     public ArrayList<Integer> cards = new ArrayList<Integer>();
     private Bitmap backgroundImage;
     private Random random = new Random(); // Add this line
-    private int currentCard;
     private int count=0;
-    private ArrayList<PointF> circlePositions = new ArrayList<>();
+    private int CardTotal=0;
+    private ArrayList<CardCircle> circlePositions = new ArrayList<>();
 
     public blackjack(Context context) {
         super(context);
 
 
         // Add integers 1 to 10 to the cards ArrayList
-        for (int i = 1; i <= 10; i++) {
-            cards.add(i);
+        for (int i = 0; i < 4; i++) {
+            cards.add(11);
+            for (int j = 2; j <= 9; j++) {
+                cards.add(j);
+            }
+        }
+        for (int i = 0; i < 16; i++) {
+            cards.add(10);
         }
         // Load the background image
         backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.dealers);
@@ -41,6 +63,7 @@ public class blackjack extends View {
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
         Paint paint= new Paint();
+
         
         // Draw the background image, scaled to fit the canvas
         if (backgroundImage != null) {
@@ -48,16 +71,24 @@ public class blackjack extends View {
             canvas.drawBitmap(backgroundImage, null, destRect, paint);
         }
 
-        // Draw all the white circles
-        paint.setColor(Color.WHITE);
-        for (PointF position : circlePositions) {
-            canvas.drawCircle(position.x, position.y, 90, paint); // Draw a circle with radius 30
+        // Draw all the white circles and their numbers
+        for (CardCircle cardCircle : circlePositions) {
+            paint.setColor(Color.WHITE);
+            canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, paint); // Draw a circle with radius 90
+
+            // Draw the card number in the center of the circle
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(50); // Set text size
+            paint.setTextAlign(Paint.Align.CENTER);
+            // Adjust Y position to center the text vertically
+            float textY = cardCircle.position.y - ((paint.descent() + paint.ascent()) / 2);
+            canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, paint);
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN&&count<6) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN&&count<5&&CardTotal<21) {
             float touchX = event.getX();
             float touchY = event.getY();
 
@@ -69,21 +100,20 @@ public class blackjack extends View {
 
             // Check if the touch is inside the "HIT" button area
             if (touchX >= hitAreaLeft && touchX <= hitAreaRight && touchY >= hitAreaTop && touchY <= hitAreaBottom) {
+                // Generate a new random card
+                int randomIndex = random.nextInt(cards.size()); // Get a random index from the cards list
+                int currentCard = cards.get(randomIndex); // Get the card number at the random index
+                cards.remove(randomIndex);
+
                 // Calculate the position for the new circle, next to the previous one
-                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f); // 70 = diameter (60) + spacing (10)
-                float newCircleY = getHeight() * 0.67f;
-                
-                circlePositions.add(new PointF(newCircleX, newCircleY));
-                
+                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f); // this is the x position of the circle we start from 0.16% of the screen and every time we add a circle we add 190f to the x position
+                float newCircleY = getHeight() * 0.67f; // this is the y position of the circle we start from 0.67% of the screen
+
+                circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
+                  CardTotal=CardTotal+currentCard;
+
                 invalidate(); // Request a redraw to show the new circle
                 count++;
-
-              /*  // Generate a new random card
-                int randomIndex = random.nextInt(cards.size());
-                currentCard = cards.get(randomIndex);
-                cards.remove(randomIndex);*/
-                // TODO: 26/11/2025 add the random value to each chip
-
             }
             return true; // Indicate that we've handled the event
         }
