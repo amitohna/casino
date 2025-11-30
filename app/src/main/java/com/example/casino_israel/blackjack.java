@@ -21,6 +21,7 @@ public class blackjack extends View {
     private Bitmap backgroundImage;
     private Random random = new Random(); // Add this line
     private int currentCard;
+    private int count=0;
     private ArrayList<PointF> circlePositions = new ArrayList<>();
 
     public blackjack(Context context) {
@@ -56,7 +57,7 @@ public class blackjack extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN&&count<6) {
             float touchX = event.getX();
             float touchY = event.getY();
 
@@ -69,12 +70,13 @@ public class blackjack extends View {
             // Check if the touch is inside the "HIT" button area
             if (touchX >= hitAreaLeft && touchX <= hitAreaRight && touchY >= hitAreaTop && touchY <= hitAreaBottom) {
                 // Calculate the position for the new circle, next to the previous one
-                float newCircleX = getWidth() * 0.26f + (circlePositions.size() * 190f); // 70 = diameter (60) + spacing (10)
+                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f); // 70 = diameter (60) + spacing (10)
                 float newCircleY = getHeight() * 0.67f;
                 
                 circlePositions.add(new PointF(newCircleX, newCircleY));
                 
                 invalidate(); // Request a redraw to show the new circle
+                count++;
 
               /*  // Generate a new random card
                 int randomIndex = random.nextInt(cards.size());
