@@ -38,7 +38,9 @@ public class blackjack extends View {
     private Random random = new Random(); // Add this line
     private int count=0;
     private int CardTotal=0;
+    private int dealercardtotal=0;
     private ArrayList<CardCircle> circlePositions = new ArrayList<>();
+    private boolean initialCardsDealt = false;
 
     public blackjack(Context context) {
         super(context);
@@ -62,9 +64,27 @@ public class blackjack extends View {
     @Override // It's good practice to use @Override for overridden methods
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
+
+        if (!initialCardsDealt && getWidth() > 0) {
+            initialCardsDealt = true;
+            // Draw two circles instantly
+            for (int i = 0; i < 2; i++) {
+                int randomIndex = random.nextInt(cards.size());
+                int currentCard = cards.get(randomIndex);
+                cards.remove(randomIndex);
+
+                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f);
+                float newCircleY = getHeight() * 0.67f;
+
+                circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
+                CardTotal += currentCard;
+                count++;
+            }
+        }
+
         Paint paint= new Paint();
 
-        
+
         // Draw the background image, scaled to fit the canvas
         if (backgroundImage != null) {
             Rect destRect = new Rect(0, 0, getWidth(), getHeight());
