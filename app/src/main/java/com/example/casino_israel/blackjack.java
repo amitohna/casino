@@ -4,100 +4,108 @@ import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas; // Import Canvas
+import android.graphics.Canvas; // Import Canvas for drawing graphics
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.Color; // Import Color
-import android.view.MotionEvent; // Import MotionEvent
+import android.graphics.Color; // Import Color for setting drawing colors
+import android.view.MotionEvent; // Import MotionEvent for handling touch input
 import android.view.View;
-import android.widget.Toast;
+import android.widget.Toast; // Import Toast for displaying brief messages
 
 import java.util.Random;
-
-
 import java.util.ArrayList;
-import java.util.Random;
 
+// The main class for our Blackjack game, extending Android's View to allow custom drawing
 public class blackjack extends View {
 
-    // Inner class to hold information about each card circle
+    // Inner class to hold information about each card circle displayed on the screen
     private class CardCircle {
-        PointF position;
-        int cardNumber;
+        PointF position; // The x,y coordinates where the center of the card circle is drawn
+        int cardNumber;   // The numerical value of the card
 
+        // Constructor for CardCircle
         CardCircle(PointF position, int cardNumber) {
             this.position = position;
             this.cardNumber = cardNumber;
         }
+
+        // Getter for the card number
         public int getCardNumber() {
             return cardNumber;
         }
     }
-
+    // ArrayList to hold all possible card values (e.g., 2-10, J,Q,K as 10, A as 11)
     public ArrayList<Integer> cards = new ArrayList<Integer>();
-    private Bitmap backgroundImage;
-    private Random random = new Random(); // Add this line
-    private int count=0;
-    private int CardTotal=0;
-    private int dealercardtotal=0;
-    private ArrayList<CardCircle> circlePositions = new ArrayList<>();
-    private ArrayList<CardCircle> dealerCirclePositions = new ArrayList<>();
-    private boolean initialCardsDealt = false;
-    private boolean playerTurnEnded = false;
+    private Bitmap backgroundImage; // The image used for the game's background
+    private Random random = new Random(); // Random number generator for drawing cards
+    private int count=0; // Tracks the number of cards the player has drawn
+    private int CardTotal=0; // The sum of the player's card numbers
+    private int dealercardtotal=0; // The sum of the dealer's card numbers
+    private ArrayList<CardCircle> circlePositions = new ArrayList<>(); // List of card circles for the player
+    private ArrayList<CardCircle> dealerCirclePositions = new ArrayList<>(); // List of card circles for the dealer
+    private boolean initialCardsDealt = false; // Flag to ensure initial cards are dealt only once
+    private boolean playerTurnEnded = false; // Flag to indicate if the player has finished their turn
+    private boolean winner; // Flag to store if the player won or lost
 
+
+    // Constructor for the blackjack custom View
     public blackjack(Context context) {
         super(context);
 
-
-        // Add integers 1 to 10 to the cards ArrayList
+        // Populate the 'cards' ArrayList with standard Blackjack card values
+        // Add four 11s (Aces)
         for (int i = 0; i < 4; i++) {
             cards.add(11);
+            // Add cards 2 through 9 (four of each)
             for (int j = 2; j <= 9; j++) {
                 cards.add(j);
             }
         }
+        // Add sixteen 10s (tens, jacks, queens, kings)
         for (int i = 0; i < 16; i++) {
             cards.add(10);
         }
-        // Load the background image
+        // Load the background image from resources
         backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.dealers);
     }
-
 
     @Override // It's good practice to use @Override for overridden methods
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
-
+        // This block ensures initial cards are dealt only after the view has been laid out (has width and height)
         if (!initialCardsDealt && getWidth() > 0) {
             initialCardsDealt = true;
             // Draw two circles instantly for the player
             for (int i = 0; i < 2; i++) {
-                int randomIndex = random.nextInt(cards.size());
-                int currentCard = cards.get(randomIndex);
-                cards.remove(randomIndex);
+                int randomIndex = random.nextInt(cards.size()); // Get a random index
+                int currentCard = cards.get(randomIndex); // Get the card number
+                cards.remove(randomIndex); // Remove the card from the deck
 
+                // Calculate position for player's new card circle
                 float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f);
                 float newCircleY = getHeight() * 0.67f;
 
+                // Add the new card to the player's hand
                 circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
-                CardTotal += currentCard;
-                count++;
+                CardTotal += currentCard; // Update player's total score
+                count++; // Increment player's card count
             }
-
-            // Draw one circle for the dealer
+            // Draw one circle for the dealer initially
             int dealerRandomIndex = random.nextInt(cards.size());
             int dealerCurrentCard = cards.get(dealerRandomIndex);
             cards.remove(dealerRandomIndex);
 
+            // Calculate position for dealer's new card circle
             float dealerCircleX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
             float dealerCircleY = getHeight() * 0.25f;
 
+            // Add the new card to the dealer's hand
             dealerCirclePositions.add(new CardCircle(new PointF(dealerCircleX, dealerCircleY), dealerCurrentCard));
-            dealercardtotal += dealerCurrentCard;
+            dealercardtotal += dealerCurrentCard; // Update dealer's total score
         }
 
-        Paint paint= new Paint();
+        Paint paint= new Paint(); // Create a new Paint object for drawing
 
 
         // Draw the background image, scaled to fit the canvas
@@ -108,13 +116,13 @@ public class blackjack extends View {
 
         // Draw all the white circles and their numbers for the player
         for (CardCircle cardCircle : circlePositions) {
-            paint.setColor(Color.WHITE);
+            paint.setColor(Color.WHITE); // Set color to white for the circle
             canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, paint); // Draw a circle with radius 90
 
             // Draw the card number in the center of the circle
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.BLACK); // Set color to black for the text
             paint.setTextSize(50); // Set text size
-            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTextAlign(Paint.Align.CENTER); // Center the text horizontally
             // Adjust Y position to center the text vertically
             float textY = cardCircle.position.y - ((paint.descent() + paint.ascent()) / 2);
             canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, paint);
@@ -135,43 +143,47 @@ public class blackjack extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Only respond to a touch down event
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            float touchX = event.getX();
-            float touchY = event.getY();
+            float touchX = event.getX(); // Get X coordinate of touch
+            float touchY = event.getY(); // Get Y coordinate of touch
 
-            // Based on the image, defining the approximate area for the "HIT" button
+            // Define the approximate area for the "HIT" button on the screen
             float hitAreaLeft = getWidth() * 0.25f;
             float hitAreaRight = getWidth() * 0.75f;
             float hitAreaTop = getHeight() * 0.80f;
             float hitAreaBottom = getHeight();
 
-            // Check if the touch is inside the "HIT" button area and it's player's turn
+            // Check if the touch is inside the "HIT" button area AND it's player's turn, and conditions allow hitting
             if (!playerTurnEnded && CardTotal < 21 && count < 5 &&
                     (touchX >= hitAreaLeft && touchX <= hitAreaRight && touchY >= hitAreaTop && touchY <= hitAreaBottom)) {
                 
-                int randomIndex = random.nextInt(cards.size());
-                int currentCard = cards.get(randomIndex);
-                cards.remove(randomIndex);
+                int randomIndex = random.nextInt(cards.size()); // Get a random card index
+                int currentCard = cards.get(randomIndex); // Get the card number
+                cards.remove(randomIndex); // Remove the card from the deck
 
+                // Calculate the position for the player's new circle, next to the previous one
                 float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f);
                 float newCircleY = getHeight() * 0.67f;
 
+                // Add the new card to the player's hand
                 circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
-                CardTotal += currentCard;
-                count++;
+                CardTotal += currentCard; // Update player's total
+                count++; // Increment player's card count
 
-                invalidate();
-                return true;
+                invalidate(); // Request a redraw to show the new circle
+                return true; // Indicate that we've handled the event
             }
 
-            // Area to click to stand and trigger dealer's turn
+            // Define the area to click to stand and trigger the dealer's turn
             float dealerAreaTop = 0;
-            float dealerAreaBottom = getHeight() * 0.40f;
+            float dealerAreaBottom = getHeight() * 0.40f; // Top 40% of the screen
 
+            // Check if the touch is within the dealer's area AND it's still the player's turn
             if (touchY >= dealerAreaTop && touchY <= dealerAreaBottom && !playerTurnEnded) {
-                playerTurnEnded = true;
+                playerTurnEnded = true; // End the player's turn
 
-                // Dealer's turn logic
+                // Dealer's turn logic: draw cards until total is 17 or more
                 while (dealercardtotal < 17) {
                     int randomIndex = random.nextInt(cards.size());
                     int currentCard = cards.get(randomIndex);
@@ -184,19 +196,22 @@ public class blackjack extends View {
                     dealercardtotal += currentCard;
                 }
 
+                // Determine winner and display Toast message
                 if(playerTurnEnded&&CardTotal>dealercardtotal)
                 {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_SHORT).show();
+                    winner=true;
                 }
                 else if(playerTurnEnded&&CardTotal<dealercardtotal)
                 {
                     Toast.makeText(getContext(), "you lost", Toast.LENGTH_SHORT).show();
+                    winner=false;
                 }
 
-                invalidate();
-                return true;
+                invalidate(); // Request a redraw to show the dealer's new cards
+                return true; // Indicate that we've handled the event
             }
         }
-        return super.onTouchEvent(event);
+        return super.onTouchEvent(event); // Let the superclass handle other touch events
     }
 }
