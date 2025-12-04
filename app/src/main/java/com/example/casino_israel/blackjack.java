@@ -197,12 +197,12 @@ public class blackjack extends View {
                 }
 
                 // Determine winner and display Toast message
-                if(playerTurnEnded&&CardTotal>dealercardtotal)
+                if(playerTurnEnded&&CardTotal>dealercardtotal&&CardTotal<=21)
                 {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_SHORT).show();
                     winner=true;
                 }
-                else if(playerTurnEnded&&CardTotal<dealercardtotal)
+                else if(playerTurnEnded&&CardTotal<dealercardtotal||CardTotal>21)
                 {
                     Toast.makeText(getContext(), "you lost", Toast.LENGTH_SHORT).show();
                     winner=false;
