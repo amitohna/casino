@@ -1,5 +1,6 @@
 package com.example.casino_israel;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ public class blackjack extends View {
     private boolean initialCardsDealt = false; // Flag to ensure initial cards are dealt only once
     private boolean playerTurnEnded = false; // Flag to indicate if the player has finished their turn
     private boolean winner; // Flag to store if the player won or lost
+    // TODO: 06/12/2025 we need to add the rule to ace to make soft numbers
 
 
     // Constructor for the blackjack custom View
@@ -128,12 +130,12 @@ public class blackjack extends View {
             canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, paint);
         }
 
-        // Draw all the white circles and their numbers for the dealer
+        // Draw all the black circles and their numbers for the dealer
         for (CardCircle cardCircle : dealerCirclePositions) {
-            paint.setColor(Color.WHITE);
+            paint.setColor(Color.BLACK);
             canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, paint);
 
-            paint.setColor(Color.BLACK);
+            paint.setColor(Color.WHITE);
             paint.setTextSize(50);
             paint.setTextAlign(Paint.Align.CENTER);
             float textY = cardCircle.position.y - ((paint.descent() + paint.ascent()) / 2);
@@ -147,6 +149,21 @@ public class blackjack extends View {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             float touchX = event.getX(); // Get X coordinate of touch
             float touchY = event.getY(); // Get Y coordinate of touch
+
+            // Area for the "BLACKJACK" title to go back
+            float titleAreaTop = 0;
+            float titleAreaBottom = getHeight() * 0.15f;
+            float titleAreaLeft = getWidth() * 0.20f;
+            float titleAreaRight = getWidth() * 0.80f;
+
+            if (touchY >= titleAreaTop && touchY <= titleAreaBottom &&
+                    touchX >= titleAreaLeft && touchX <= titleAreaRight) {
+                Context context = getContext();
+                if (context instanceof Activity) {
+                    ((Activity) context).finish(); // Close the current activity
+                }
+                return true;
+            }
 
             // Define the approximate area for the "HIT" button on the screen
             float hitAreaLeft = getWidth() * 0.25f;
@@ -176,7 +193,7 @@ public class blackjack extends View {
             }
 
             // Define the area to click to stand and trigger the dealer's turn
-            float dealerAreaTop = 0;
+            float dealerAreaTop = getHeight() * 0.15f; // Start below the title area
             float dealerAreaBottom = getHeight() * 0.40f; // Top 40% of the screen
 
             // Check if the touch is within the dealer's area AND it's still the player's turn
@@ -197,15 +214,19 @@ public class blackjack extends View {
                 }
 
                 // Determine winner and display Toast message
-                if(playerTurnEnded&&CardTotal>dealercardtotal&&CardTotal<=21)
+                if(playerTurnEnded&&CardTotal<=21&&CardTotal>dealercardtotal||dealercardtotal>21)
                 {
-                    Toast.makeText(getContext(), "you won", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "you won", Toast.LENGTH_LONG).show();
                     winner=true;
                 }
                 else if(playerTurnEnded&&CardTotal<dealercardtotal||CardTotal>21)
                 {
-                    Toast.makeText(getContext(), "you lost", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "you lost", Toast.LENGTH_LONG).show();
                     winner=false;
+                }
+                if(CardTotal==dealercardtotal&&playerTurnEnded&&CardTotal<=21&&dealercardtotal<=21)
+                {
+                    Toast.makeText(getContext(), "tie", Toast.LENGTH_LONG).show();
                 }
 
                 invalidate(); // Request a redraw to show the dealer's new cards
