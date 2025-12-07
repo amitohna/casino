@@ -1,7 +1,6 @@
 package com.example.casino_israel;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,9 +9,13 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.Color; // Import Color for setting drawing colors
+import android.os.Handler; // Import Handler for animation loop
+import android.os.Message; // Import Message for Handler
 import android.view.MotionEvent; // Import MotionEvent for handling touch input
 import android.view.View;
 import android.widget.Toast; // Import Toast for displaying brief messages
+
+import androidx.annotation.NonNull; // For Handler.Callback
 
 import java.util.Random;
 import java.util.ArrayList;
@@ -36,110 +39,167 @@ public class blackjack extends View {
             return cardNumber;
         }
     }
+
     // ArrayList to hold all possible card values (e.g., 2-10, J,Q,K as 10, A as 11)
     public ArrayList<Integer> cards = new ArrayList<Integer>();
     private Bitmap backgroundImage; // The image used for the game's background
+    private Bitmap winnerChipBitmap; // The image for the falling winner chip
     private Random random = new Random(); // Random number generator for drawing cards
     private int count=0; // Tracks the number of cards the player has drawn
     private int CardTotal=0; // The sum of the player's card numbers
     private int dealercardtotal=0; // The sum of the dealer's card numbers
     private ArrayList<CardCircle> circlePositions = new ArrayList<>(); // List of card circles for the player
     private ArrayList<CardCircle> dealerCirclePositions = new ArrayList<>(); // List of card circles for the dealer
+    private ArrayList<FallingCardChip> winnerChips = new ArrayList<>(); // List of falling chips for the winner animation
     private boolean initialCardsDealt = false; // Flag to ensure initial cards are dealt only once
     private boolean playerTurnEnded = false; // Flag to indicate if the player has finished their turn
     private boolean winner; // Flag to store if the player won or lost
-    // TODO: 06/12/2025 we need to add the rule to ace to make soft numbers
 
+    // Animation related fields (only for winner chip now)
+    private Handler handler; // Handles messages from the animation thread to update UI
+    private AnimationThread animationThread; // Thread for continuous animation updates
+    private final int ANIMATION_INTERVAL = 50; // Milliseconds between animation updates
+    private final float WINNER_CHIP_DROP_SPEED = 30f; // Pixels per animation frame for winner chip
+    private Paint drawingPaint; // Reused Paint object for drawing performance
 
     // Constructor for the blackjack custom View
     public blackjack(Context context) {
         super(context);
 
         // Populate the 'cards' ArrayList with standard Blackjack card values
-        // Add four 11s (Aces)
-        for (int i = 0; i < 4; i++) {
-            cards.add(11);
-            // Add cards 2 through 9 (four of each)
+        for (int i = 0; i < 4; i++) { // Four suits
+            cards.add(11); // Aces
             for (int j = 2; j <= 9; j++) {
-                cards.add(j);
+                cards.add(j); // Cards 2 through 9
             }
         }
-        // Add sixteen 10s (tens, jacks, queens, kings)
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; i++) { // Sixteen 10-value cards (10, J, Q, K)
             cards.add(10);
         }
+
         // Load the background image from resources
         backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.dealers);
+        // Load the winner chip image from resources (assuming R.drawable.chip exists)
+        winnerChipBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.chip);
+
+        // Initialize Paint object once for drawing
+        drawingPaint = new Paint();
+
+        // Initialize Handler for animation updates from the animation thread
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message message) {
+                boolean chipsStillAnimating = false;
+
+                // Move winner chips if they are animating
+                for (FallingCardChip chip : winnerChips) {
+                    if (chip.isAnimating()) {
+                        chip.move();
+                        chipsStillAnimating = true;
+                    }
+                }
+
+                // Request redraw only if any chip is still animating
+                if (chipsStillAnimating) {
+                    invalidate();
+                }
+                return true; // Message handled
+            }
+        });
+
+        // Start the animation thread
+        animationThread = new AnimationThread();
+        animationThread.start();
+    }
+
+    // Private inner class for the animation thread
+    private class AnimationThread extends Thread {
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    Thread.sleep(ANIMATION_INTERVAL); // Pause for a short duration
+                    handler.sendEmptyMessage(0); // Tell the handler to update and redraw
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override // It's good practice to use @Override for overridden methods
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
+
         // This block ensures initial cards are dealt only after the view has been laid out (has width and height)
         if (!initialCardsDealt && getWidth() > 0) {
             initialCardsDealt = true;
-            // Draw two circles instantly for the player
+            
+            // Deal two initial cards for the player (no falling animation)
             for (int i = 0; i < 2; i++) {
                 int randomIndex = random.nextInt(cards.size()); // Get a random index
                 int currentCard = cards.get(randomIndex); // Get the card number
                 cards.remove(randomIndex); // Remove the card from the deck
 
-                // Calculate position for player's new card circle
-                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f);
-                float newCircleY = getHeight() * 0.67f;
+                // Calculate final position for player's new card circle
+                float finalX = getWidth() * 0.16f + (circlePositions.size() * 190f);
+                float finalY = getHeight() * 0.67f;
 
-                // Add the new card to the player's hand
-                circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
+                // Add the new card to the player's hand (no animation)
+                circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
                 CardTotal += currentCard; // Update player's total score
                 count++; // Increment player's card count
             }
-            // Draw one circle for the dealer initially
+
+            // Deal one initial card for the dealer (no falling animation)
             int dealerRandomIndex = random.nextInt(cards.size());
             int dealerCurrentCard = cards.get(dealerRandomIndex);
             cards.remove(dealerRandomIndex);
 
-            // Calculate position for dealer's new card circle
-            float dealerCircleX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
-            float dealerCircleY = getHeight() * 0.25f;
+            // Calculate final position for dealer's new card circle
+            float dealerFinalX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
+            float dealerFinalY = getHeight() * 0.25f;
 
-            // Add the new card to the dealer's hand
-            dealerCirclePositions.add(new CardCircle(new PointF(dealerCircleX, dealerCircleY), dealerCurrentCard));
+            // Add the new card to the dealer's hand (no animation)
+            dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));
             dealercardtotal += dealerCurrentCard; // Update dealer's total score
         }
-
-        Paint paint= new Paint(); // Create a new Paint object for drawing
-
 
         // Draw the background image, scaled to fit the canvas
         if (backgroundImage != null) {
             Rect destRect = new Rect(0, 0, getWidth(), getHeight());
-            canvas.drawBitmap(backgroundImage, null, destRect, paint);
+            canvas.drawBitmap(backgroundImage, null, destRect, drawingPaint);
         }
 
         // Draw all the white circles and their numbers for the player
         for (CardCircle cardCircle : circlePositions) {
-            paint.setColor(Color.WHITE); // Set color to white for the circle
-            canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, paint); // Draw a circle with radius 90
+            drawingPaint.setColor(Color.WHITE); // Set color to white for the circle
+            canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, drawingPaint); // Draw a circle with radius 90
 
             // Draw the card number in the center of the circle
-            paint.setColor(Color.BLACK); // Set color to black for the text
-            paint.setTextSize(50); // Set text size
-            paint.setTextAlign(Paint.Align.CENTER); // Center the text horizontally
+            drawingPaint.setColor(Color.BLACK); // Set color to black for the text
+            drawingPaint.setTextSize(50); // Set text size
+            drawingPaint.setTextAlign(Paint.Align.CENTER); // Center the text horizontally
             // Adjust Y position to center the text vertically
-            float textY = cardCircle.position.y - ((paint.descent() + paint.ascent()) / 2);
-            canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, paint);
+            float textY = cardCircle.position.y - ((drawingPaint.descent() + drawingPaint.ascent()) / 2);
+            canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, drawingPaint);
         }
 
         // Draw all the black circles and their numbers for the dealer
         for (CardCircle cardCircle : dealerCirclePositions) {
-            paint.setColor(Color.BLACK);
-            canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, paint);
+            drawingPaint.setColor(Color.BLACK);
+            canvas.drawCircle(cardCircle.position.x, cardCircle.position.y, 90, drawingPaint);
 
-            paint.setColor(Color.WHITE);
-            paint.setTextSize(50);
-            paint.setTextAlign(Paint.Align.CENTER);
-            float textY = cardCircle.position.y - ((paint.descent() + paint.ascent()) / 2);
-            canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, paint);
+            drawingPaint.setColor(Color.WHITE);
+            drawingPaint.setTextSize(50);
+            drawingPaint.setTextAlign(Paint.Align.CENTER);
+            float textY = cardCircle.position.y - ((drawingPaint.descent() + drawingPaint.ascent()) / 2);
+            canvas.drawText(String.valueOf(cardCircle.cardNumber), cardCircle.position.x, textY, drawingPaint);
+        }
+
+        // Draw all the falling winner chips
+        for (FallingCardChip chip : winnerChips) {
+            chip.draw(canvas, drawingPaint);
         }
     }
 
@@ -161,7 +221,7 @@ public class blackjack extends View {
                 Context context = getContext();
                 if (context instanceof Activity) {
                     ((Activity) context).finish(); // Close the current activity
-                }
+                } 
                 return true;
             }
 
@@ -179,12 +239,12 @@ public class blackjack extends View {
                 int currentCard = cards.get(randomIndex); // Get the card number
                 cards.remove(randomIndex); // Remove the card from the deck
 
-                // Calculate the position for the player's new circle, next to the previous one
-                float newCircleX = getWidth() * 0.16f + (circlePositions.size() * 190f);
-                float newCircleY = getHeight() * 0.67f;
+                // Calculate final position for player's new card circle
+                float finalX = getWidth() * 0.16f + (circlePositions.size() * 190f);
+                float finalY = getHeight() * 0.67f;
 
-                // Add the new card to the player's hand
-                circlePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
+                // Add the new card to the player's hand (no animation)
+                circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
                 CardTotal += currentCard; // Update player's total
                 count++; // Increment player's card count
 
@@ -203,33 +263,39 @@ public class blackjack extends View {
                 // Dealer's turn logic: draw cards until total is 17 or more
                 while (dealercardtotal < 17) {
                     int randomIndex = random.nextInt(cards.size());
-                    int currentCard = cards.get(randomIndex);
+                    int dealerCurrentCard = cards.get(randomIndex);
                     cards.remove(randomIndex);
 
-                    float newCircleX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
-                    float newCircleY = getHeight() * 0.25f;
+                    // Calculate final position for dealer's new card circle
+                    float dealerFinalX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
+                    float dealerFinalY = getHeight() * 0.25f;
 
-                    dealerCirclePositions.add(new CardCircle(new PointF(newCircleX, newCircleY), currentCard));
-                    dealercardtotal += currentCard;
+                    // Add the new card to the dealer's hand (no animation)
+                    dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));
+                    dealercardtotal += dealerCurrentCard;
                 }
 
                 // Determine winner and display Toast message
-                if(playerTurnEnded&&CardTotal<=21&&CardTotal>dealercardtotal||dealercardtotal>21)
-                {
+                if(playerTurnEnded && CardTotal <= 21 && (CardTotal > dealercardtotal || dealercardtotal > 21)) {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_LONG).show();
                     winner=true;
-                }
-                else if(playerTurnEnded&&CardTotal<dealercardtotal||CardTotal>21)
-                {
+
+                    // Trigger winner chip animation
+                    float centerX = getWidth() / 2f;
+                    float centerY = getHeight()*1.15f; // 2f;
+                    winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, 0f), 0, WINNER_CHIP_DROP_SPEED, centerY));
+
+                } else if (playerTurnEnded && (CardTotal < dealercardtotal || CardTotal > 21)) {
                     Toast.makeText(getContext(), "you lost", Toast.LENGTH_LONG).show();
                     winner=false;
-                }
-                if(CardTotal==dealercardtotal&&playerTurnEnded&&CardTotal<=21&&dealercardtotal<=21)
-                {
+
+
+
+                } else if (CardTotal == dealercardtotal && playerTurnEnded && CardTotal <= 21 && dealercardtotal <= 21) {
                     Toast.makeText(getContext(), "tie", Toast.LENGTH_LONG).show();
                 }
 
-                invalidate(); // Request a redraw to show the dealer's new cards
+                invalidate(); // Request a redraw to show the dealer's new cards and winner chip if any
                 return true; // Indicate that we've handled the event
             }
         }
