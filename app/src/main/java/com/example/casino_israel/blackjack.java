@@ -78,7 +78,7 @@ public class blackjack extends View {
         }
 
         // Load the background image from resources
-        backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.dealers);
+        backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.dealers2);
         // Load the winner chip image from resources (assuming R.drawable.chip exists)
         winnerChipBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.chip);
 
