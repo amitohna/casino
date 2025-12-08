@@ -61,6 +61,8 @@ public class blackjack extends View {
     private final int ANIMATION_INTERVAL = 50; // Milliseconds between animation updates
     private final float WINNER_CHIP_DROP_SPEED = 30f; // Pixels per animation frame for winner chip
     private Paint drawingPaint; // Reused Paint object for drawing performance
+    private boolean side = true; // True for down, false for up
+
 
     // Constructor for the blackjack custom View
     public blackjack(Context context) {
@@ -73,7 +75,7 @@ public class blackjack extends View {
                 cards.add(j); // Cards 2 through 9
             }
         }
-        for (int i = 0; i < 16; i++) { // Sixteen 10-value cards (10, J, Q, K)
+        for (int i = 0; i < 16; i++) { // Sixteen 10-value cards (10, J, Q, K) 
             cards.add(10);
         }
 
@@ -94,7 +96,7 @@ public class blackjack extends View {
                 // Move winner chips if they are animating
                 for (FallingCardChip chip : winnerChips) {
                     if (chip.isAnimating()) {
-                        chip.move();
+                        chip.move(side);
                         chipsStillAnimating = true;
                     }
                 }
@@ -282,13 +284,16 @@ public class blackjack extends View {
 
                     // Trigger winner chip animation
                     float centerX = getWidth() / 2f;
-                    float centerY = getHeight()*1.15f; // 2f;
+                    float centerY = getHeight()*1.15f; // Target for downward animation
                     winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, 0f), 0, WINNER_CHIP_DROP_SPEED, centerY));
 
                 } else if (playerTurnEnded && (CardTotal < dealercardtotal || CardTotal > 21)) {
                     Toast.makeText(getContext(), "you lost", Toast.LENGTH_LONG).show();
                     winner=false;
-
+                    side=false;
+                    float centerX = getWidth() / 2f;
+                    float centerY = 0f; // Target for upward animation (top of the screen)
+                    winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, getHeight()), 0, WINNER_CHIP_DROP_SPEED, centerY));
 
 
                 } else if (CardTotal == dealercardtotal && playerTurnEnded && CardTotal <= 21 && dealercardtotal <= 21) {
