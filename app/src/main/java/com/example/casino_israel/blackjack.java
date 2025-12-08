@@ -21,7 +21,7 @@ import java.util.Random;
 import java.util.ArrayList;
 
 // The main class for our Blackjack game, extending Android's View to allow custom drawing
-public class blackjack extends View {
+public class blackjack extends View { // TODO: 08/12/2025 making the option to re run the blackjack 
 
     // Inner class to hold information about each card circle displayed on the screen
     private class CardCircle {
