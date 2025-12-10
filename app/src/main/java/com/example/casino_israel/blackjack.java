@@ -62,6 +62,9 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
     private final float WINNER_CHIP_DROP_SPEED = 30f; // Pixels per animation frame for winner chip
     private Paint drawingPaint; // Reused Paint object for drawing performance
     private boolean side = true; // True for down, false for up
+    private boolean IsAce=false;
+    private boolean IsAceDealer=false;
+
 
 
     // Constructor for the blackjack custom View
@@ -141,6 +144,14 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             for (int i = 0; i < 2; i++) {
                 int randomIndex = random.nextInt(cards.size()); // Get a random index
                 int currentCard = cards.get(randomIndex); // Get the card number
+                if(currentCard==11)
+                {
+                    IsAce=true;
+                }
+                else
+                {
+                    IsAce=false;
+                }
                 cards.remove(randomIndex); // Remove the card from the deck
 
                 // Calculate final position for player's new card circle
@@ -150,12 +161,24 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 // Add the new card to the player's hand (no animation)
                 circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
                 CardTotal += currentCard; // Update player's total score
+                if(IsAce&&CardTotal>21)
+                {
+                    CardTotal-=10;
+                }
                 count++; // Increment player's card count
             }
 
             // Deal one initial card for the dealer (no falling animation)
             int dealerRandomIndex = random.nextInt(cards.size());
             int dealerCurrentCard = cards.get(dealerRandomIndex);
+            if(dealerCurrentCard==11)
+            {
+                IsAceDealer=true;
+            }
+            else
+            {
+                IsAceDealer=false;
+            }
             cards.remove(dealerRandomIndex);
 
             // Calculate final position for dealer's new card circle
@@ -165,6 +188,12 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             // Add the new card to the dealer's hand (no animation)
             dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));
             dealercardtotal += dealerCurrentCard; // Update dealer's total score
+            if(IsAceDealer&&dealercardtotal>21)
+            {
+                dealercardtotal-=10;
+            }
+
+
         }
 
         // Draw the background image, scaled to fit the canvas
@@ -239,6 +268,14 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 
                 int randomIndex = random.nextInt(cards.size()); // Get a random card index
                 int currentCard = cards.get(randomIndex); // Get the card number
+                if(currentCard==11)
+                {
+                    IsAce=true;
+                }
+                else
+                {
+                    IsAce=false;
+                }
                 cards.remove(randomIndex); // Remove the card from the deck
 
                 // Calculate final position for player's new card circle
@@ -248,6 +285,10 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 // Add the new card to the player's hand (no animation)
                 circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
                 CardTotal += currentCard; // Update player's total
+                if(IsAce&&CardTotal>21)
+                {
+                    CardTotal-=10;
+                }
                 count++; // Increment player's card count
 
                 invalidate(); // Request a redraw to show the new circle
@@ -266,6 +307,14 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 while (dealercardtotal < 17) {
                     int randomIndex = random.nextInt(cards.size());
                     int dealerCurrentCard = cards.get(randomIndex);
+                    if(dealerCurrentCard==11)
+                    {
+                        IsAceDealer=true;
+                    }
+                    else
+                    {
+                        IsAceDealer=false;
+                    }
                     cards.remove(randomIndex);
 
                     // Calculate final position for dealer's new card circle
@@ -275,6 +324,11 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                     // Add the new card to the dealer's hand (no animation)
                     dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));
                     dealercardtotal += dealerCurrentCard;
+                    if(IsAceDealer&&dealercardtotal>21)
+                    {
+                        dealercardtotal-=10;
+                    }
+
                 }
 
                 // Determine winner and display Toast message
