@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
 private Button btn;
+private Button btn2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,12 +27,24 @@ private Button btn;
         });
 
         btn = findViewById(R.id.button);
+       btn2=findViewById(R.id.score_board_button);
+       btn2.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View v) {
+               Intent intent = new Intent(MainActivity.this, Scoreboard.class);
+               startActivity(intent);
+           }
+       });
         btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BoardGame.class);
                 startActivity(intent);
             }
+
+
+
+
         });
     }
 }

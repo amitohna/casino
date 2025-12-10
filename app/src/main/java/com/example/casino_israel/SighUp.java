@@ -1,4 +1,4 @@
 package com.example.casino_israel;
 
-public class login {
+public class SighUp {
 }
