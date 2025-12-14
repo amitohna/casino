@@ -59,7 +59,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
     private Handler handler; // Handles messages from the animation thread to update UI
     private AnimationThread animationThread; // Thread for continuous animation updates
     private final int ANIMATION_INTERVAL = 50; // Milliseconds between animation updates
-    private final float WINNER_CHIP_DROP_SPEED = 30f; // Pixels per animation frame for winner chip
+    private final float WINNER_CHIP_DROP_SPEED = 40f; // Pixels per animation frame for winner chip
     private Paint drawingPaint; // Reused Paint object for drawing performance
     private boolean side = true; // True for down, false for up
     private boolean IsAce=false;
@@ -250,6 +250,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             if (touchY >= titleAreaTop && touchY <= titleAreaBottom &&
                     touchX >= titleAreaLeft && touchX <= titleAreaRight) {
                 Context context = getContext();
+                winner=false;
                 if (context instanceof Activity) {
                     ((Activity) context).finish(); // Close the current activity
                 } 
@@ -346,7 +347,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                     winner=false;
                     side=false;
                     float centerX = getWidth() / 2f;
-                    float centerY = getHeight() * -0.5f; // Target for upward animation (top of the screen) todo fix this
+                    float centerY = getHeight() * -0.5f; // Target for upward animation (top of the screen)
                     winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, getHeight()), 0, WINNER_CHIP_DROP_SPEED, centerY));
 
 
