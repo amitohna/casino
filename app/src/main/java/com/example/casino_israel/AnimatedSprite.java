@@ -25,11 +25,10 @@ public abstract class AnimatedSprite {
     // Updates the sprite's position. Stops animation if targetY is reached.
     public void move(boolean side) {
         if (isAnimating) {
-            // Move downwards
-            if(side){
+            // Move downwards (for winning chips)
+            if (side) {
                 if (y < targetY) {
                     y += dy;
-                    // If we've passed or reached the target, snap to it and stop animating
                     if (y >= targetY) {
                         y = targetY;
                         isAnimating = false;
@@ -38,10 +37,9 @@ public abstract class AnimatedSprite {
                     y = targetY;
                     isAnimating = false;
                 }
-            }
-            if (!side)
-            {
-                targetY=targetY*-1;
+            } 
+            // Move upwards (for losing chips)
+            else {
                 if (y > targetY) {
                     y -= dy;
                     // If we've passed or reached the target, snap to it and stop animating
@@ -49,12 +47,11 @@ public abstract class AnimatedSprite {
                         y = targetY;
                         isAnimating = false;
                     }
-                } else { // If for some reason it started below or at target, stop animating immediately
+                } else { // If for some reason it started above or at target, stop animating immediately
                     y = targetY;
                     isAnimating = false;
                 }
             }
-
         }
     }
 

@@ -346,7 +346,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                     winner=false;
                     side=false;
                     float centerX = getWidth() / 2f;
-                    float centerY = 0f; // Target for upward animation (top of the screen) todo fix this
+                    float centerY = getHeight() * -0.5f; // Target for upward animation (top of the screen) todo fix this
                     winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, getHeight()), 0, WINNER_CHIP_DROP_SPEED, centerY));
 
 
