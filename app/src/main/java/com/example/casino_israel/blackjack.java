@@ -336,6 +336,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 if(playerTurnEnded && CardTotal <= 21 && (CardTotal > dealercardtotal || dealercardtotal > 21)) {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_LONG).show();
                     winner=true;
+                    // TODO: 14/12/2025 i think there a problem with the ace and the deeler winning 
 
                     // Trigger winner chip animation
                     float centerX = getWidth() / 2f;
