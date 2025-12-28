@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class ActivityGames extends AppCompatActivity {
 private boolean check;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
