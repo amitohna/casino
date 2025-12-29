@@ -156,7 +156,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
 
                 // Calculate final position for player's new card circle
                 float finalX = getWidth() * 0.16f + (circlePositions.size() * 190f);
-                float finalY = getHeight() * 0.67f;
+                float finalY = getHeight() * 0.75f; // Changed from 0.67f to 0.75f
 
                 // Add the new card to the player's hand (no animation)
                 circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
@@ -183,7 +183,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
 
             // Calculate final position for dealer's new card circle
             float dealerFinalX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
-            float dealerFinalY = getHeight() * 0.25f;
+            float dealerFinalY = getHeight() * 0.67f; // Changed from 0.75f to 0.67f
 
             // Add the new card to the dealer's hand (no animation)
             dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));
@@ -281,7 +281,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
 
                 // Calculate final position for player's new card circle
                 float finalX = getWidth() * 0.16f + (circlePositions.size() * 190f);
-                float finalY = getHeight() * 0.67f;
+                float finalY = getHeight() * 0.75f; // Changed from 0.67f to 0.75f
 
                 // Add the new card to the player's hand (no animation)
                 circlePositions.add(new CardCircle(new PointF(finalX, finalY), currentCard));
@@ -320,7 +320,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
 
                     // Calculate final position for dealer's new card circle
                     float dealerFinalX = getWidth() * 0.16f + (dealerCirclePositions.size() * 190f);
-                    float dealerFinalY = getHeight() * 0.25f;
+                    float dealerFinalY = getHeight() * 0.67f; // Changed from 0.75f to 0.67f
 
                     // Add the new card to the dealer's hand (no animation)
                     dealerCirclePositions.add(new CardCircle(new PointF(dealerFinalX, dealerFinalY), dealerCurrentCard));

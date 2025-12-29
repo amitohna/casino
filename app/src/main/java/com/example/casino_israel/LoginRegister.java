@@ -16,8 +16,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-public class LoginRegister extends AppCompatActivity {
+public class LoginRegister extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     Button btnRegister, btnLogin;
     EditText etEmailAddress, etNumberPassword;
@@ -98,11 +101,11 @@ public class LoginRegister extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
-                                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                                Intent intent = new Intent(LoginRegister.this, MainActivity.class);
                                 startActivity(intent);
                             } else {
                                 // If sign in fails, display a message to the user.
-                                Toast.makeText(MainActivity.this, "login failed.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginRegister.this, "login failed.", Toast.LENGTH_SHORT).show();
 
                             }
                         }
