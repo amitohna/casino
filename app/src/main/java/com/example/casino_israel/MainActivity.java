@@ -41,10 +41,10 @@ private Button btn2;
                 Intent intent = new Intent(MainActivity.this, BoardGame.class);
                 startActivity(intent);
             }
-
-
-
-
         });
+
+        // Show the SighUp dialog immediately when MainActivity starts
+        SighUp playAgainDialog = new SighUp(MainActivity.this);
+        playAgainDialog.show();
     }
 }
