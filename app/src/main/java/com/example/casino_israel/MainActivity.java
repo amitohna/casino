@@ -42,9 +42,13 @@ private Button btn2;
                 startActivity(intent);
             }
         });
+       // Check if the "good" extra is present and true
+       //  if(getIntent().getBooleanExtra("good",false))
+         {
+             // Show the SighUp dialog immediately when MainActivity starts
+             SighUp playAgainDialog = new SighUp(MainActivity.this);
+             playAgainDialog.show();
+         }
 
-        // Show the SighUp dialog immediately when MainActivity starts
-        SighUp playAgainDialog = new SighUp(MainActivity.this);
-        playAgainDialog.show();
     }
 }

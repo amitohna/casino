@@ -24,6 +24,8 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
     private FirebaseAuth mAuth;
     Button btnRegister, btnLogin;
     EditText etEmailAddress, etNumberPassword;
+    private boolean isLogin = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,15 +45,17 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
     @Override
     public void onStart() {
         super.onStart();
+        isLogin=false;
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = mAuth.getCurrentUser(); // TODO: 31/12/2025 is it saving ok but doesnt sync we the fire base and need to fix the dialog 
         if(currentUser != null){
-            reload();
+            //reload();
         }
     }
 
     private void reload() {
         Intent intent = new Intent(LoginRegister.this, MainActivity.class);
+       // intent.putExtra("good", isLogin);
         startActivity(intent);
     }
 
@@ -66,8 +70,10 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                isLogin=true;
                                 // Sign in success, update UI with the signed-in user's information
                                 Intent intent = new Intent(LoginRegister.this, MainActivity.class);
+                               // intent.putExtra("good", isLogin);
                                 startActivity(intent);
 
                             } else {
@@ -102,6 +108,7 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Intent intent = new Intent(LoginRegister.this, MainActivity.class);
+                               // intent.putExtra("good", isLogin);
                                 startActivity(intent);
                             } else {
                                 // If sign in fails, display a message to the user.
