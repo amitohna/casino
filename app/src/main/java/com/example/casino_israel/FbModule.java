@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,7 +20,7 @@ public class FbModule {
     Context context;
     ArrayList<players> myRecords;
     public FbModule(Context context) {
-        //database = FirebaseDatabase.getInstance("https://fbrecordst-default-rtdb.firebaseio.com");
+        database = FirebaseDatabase.getInstance("https://casino-finalproject-default-rtdb.firebaseio.com/");
         database = FirebaseDatabase.getInstance();
         this.context = context;
         this.myRecords = myRecords;
@@ -45,14 +46,15 @@ public class FbModule {
         });
 
     }
+
     public void setDetails(int id, String type, double wallet)
     {
         // Write a message to the database
-        //DatabaseReference myRef = database.getReference("records").push(); // push adds new node with unique value
+        DatabaseReference myRef = database.getReference("records").push(); // push adds new node with unique value
 
-      //  DatabaseReference myRef = database.getReference("records/" + FirebaseAuth.getInstance().getUid());
+        //DatabaseReference myRef = database.getReference("records/" + FirebaseAuth.getInstance().getUid());
 
         players rec = new players(id, type, (int)wallet);
-       // myRef.setValue(rec);
+        myRef.setValue(rec);
     }
 }

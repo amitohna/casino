@@ -3,8 +3,12 @@ package com.example.casino_israel;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -28,7 +32,7 @@ public class SighUp extends Dialog {
         btnYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Start LoginResigter activity
+                // Start LoginRegister activity
                 Intent intent = new Intent(getContext(), LoginRegister.class);
                 getContext().startActivity(intent);
                 dismiss(); // Close the dialog
@@ -43,5 +47,12 @@ public class SighUp extends Dialog {
                 dismiss(); // Close the dialog
             }
         });
+
+        // Center the dialog and make its width match the content
+        if (getWindow() != null) {
+            getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            getWindow().setGravity(Gravity.CENTER);
+            getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); // Make background transparent to see rounded corners if any
+        }
     }
 }
