@@ -71,6 +71,7 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 isLogin=true;
+
                                 // Sign in success, update UI with the signed-in user's information
                                 Intent intent = new Intent(LoginRegister.this, MainActivity.class);
                                // intent.putExtra("good", isLogin);

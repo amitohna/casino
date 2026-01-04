@@ -50,9 +50,9 @@ public class FbModule {
     public void setDetails(int id, String type, double wallet)
     {
         // Write a message to the database
-        DatabaseReference myRef = database.getReference("records").push(); // push adds new node with unique value
+        //DatabaseReference myRef = database.getReference("records").push(); // push adds new node with unique value
 
-        //DatabaseReference myRef = database.getReference("records/" + FirebaseAuth.getInstance().getUid());
+        DatabaseReference myRef = database.getReference("records/" + FirebaseAuth.getInstance().getUid());
 
         players rec = new players(id, type, (int)wallet);
         myRef.setValue(rec);

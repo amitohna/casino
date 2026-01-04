@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.example.casino_israel.FbModule; // Import FbModule
 
 public class MainActivity extends AppCompatActivity {
     private Button btn;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSignOut; // Declare logout button
     private FirebaseAuth mAuth;
     private TextView tvUserEmail; // Declare TextView
+    private FbModule fbModule; // Declare FbModule instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        // Initialize FbModule
+        fbModule = new FbModule(this);
 
         // Initialize TextView and Buttons
         tvUserEmail = findViewById(R.id.tvUserEmail);
@@ -68,6 +73,24 @@ public class MainActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    String userIdString = user.getUid();
+                    // IMPORTANT: The 'id' parameter in FbModule.setDetails expects an int.
+                    // Using hashCode() of the Firebase UID as a temporary solution.
+                    // This is NOT guaranteed to be unique and can produce negative numbers.
+                    // A robust solution would involve storing a unique integer ID for each user
+                    // in your database, linked to their Firebase UID, and retrieving it here.
+                    int userIdInt = userIdString.hashCode();
+
+                    // IMPORTANT: 'walletamount' currently defaults to 1000.0.
+                    // In a real application, this value should be fetched from the database
+                    // (e.g., from the user's profile data) when the activity starts or the game begins.
+                    double walletamount = 1000.0; // Placeholder for initial wallet amount
+                    // TODO: 04/01/2026 there is massives bugs in the app because of this 
+                    fbModule.setDetails(userIdInt, "blackjack", walletamount);
+                }
+
                 Intent intent = new Intent(MainActivity.this, BoardGame.class);
                 startActivity(intent);
             }
