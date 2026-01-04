@@ -31,12 +31,12 @@ public class FbModule {
         myQuery.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                myRecords.clear();  // clear the array list
+              /*  myRecords.clear();  // clear the array list
                 for(DataSnapshot userSnapshot : snapshot.getChildren())
                 {
                     players currentMyRecord =userSnapshot.getValue(players.class);
                     myRecords.add(0, currentMyRecord);
-                }
+                }*/
             }
 
             @Override
@@ -47,14 +47,12 @@ public class FbModule {
 
     }
 
-    public void setDetails(int id, String type, double wallet)
+    public void setDetails(String id, String name, double wallet)
     {
         // Write a message to the database
-        //DatabaseReference myRef = database.getReference("records").push(); // push adds new node with unique value
+        DatabaseReference myRef = database.getReference("records/" + id);
 
-        DatabaseReference myRef = database.getReference("records/" + FirebaseAuth.getInstance().getUid());
-
-        players rec = new players(id, type, (int)wallet);
+        players rec = new players(id, name, wallet);
         myRef.setValue(rec);
     }
 }

@@ -75,20 +75,24 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
-                    String userIdString = user.getUid();
-                    // IMPORTANT: The 'id' parameter in FbModule.setDetails expects an int.
-                    // Using hashCode() of the Firebase UID as a temporary solution.
-                    // This is NOT guaranteed to be unique and can produce negative numbers.
-                    // A robust solution would involve storing a unique integer ID for each user
-                    // in your database, linked to their Firebase UID, and retrieving it here.
-                    int userIdInt = userIdString.hashCode();
+                    String userId = user.getUid(); // User UID for id
+                    String userName = ""; // Default name
+                    String userEmail = user.getEmail();
 
-                    // IMPORTANT: 'walletamount' currently defaults to 1000.0.
-                    // In a real application, this value should be fetched from the database
-                    // (e.g., from the user's profile data) when the activity starts or the game begins.
-                    double walletamount = 1000.0; // Placeholder for initial wallet amount
-                    // TODO: 04/01/2026 there is massives bugs in the app because of this 
-                    fbModule.setDetails(userIdInt, "blackjack", walletamount);
+                    if (userEmail != null && userEmail.contains("@")) {
+                        userName = userEmail.substring(0, userEmail.indexOf("@"));
+                    } else if (userEmail != null) {
+                        // If email exists but doesn't contain '@', use the full email as name
+                        userName = userEmail;
+                    } else {
+                        // Fallback if email is null, use a generic name or UID
+                        userName = "GuestUser"; // Or use userId, but email is preferred for name
+                    }
+
+                    double walletamount = 1000.0; // Wallet is 1000.0
+
+                    // Call setDetails with correct types and values
+                    fbModule.setDetails(userId, userName, walletamount);
                 }
 
                 Intent intent = new Intent(MainActivity.this, BoardGame.class);

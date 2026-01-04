@@ -1,22 +1,26 @@
 package com.example.casino_israel;
 
 public class players {
-    private double wallet;
+    private String id; // Remains String
     private String name;
-    private int id;
+    private double wallet; // Changed back to double
 
-public players(double wallet, String name, int id) {
-    this.wallet = wallet;
-    this.name = name;
-    this.id = id;
-}
-
-    public double getWallet() {
-        return wallet;
+    public players() {
+        // Default constructor required for Firebase
     }
 
-    public void setWallet(double wallet) {
+    public players(String id, String name, double wallet) {
+        this.id = id;
+        this.name = name;
         this.wallet = wallet;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -27,11 +31,11 @@ public players(double wallet, String name, int id) {
         this.name = name;
     }
 
-    public int getId() {
-        return id;
+    public double getWallet() {
+        return wallet;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setWallet(double wallet) {
+        this.wallet = wallet;
     }
 }
