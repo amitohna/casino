@@ -11,6 +11,17 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/tvUserEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" 
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"  />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="welcome to amit casino"
@@ -25,13 +36,22 @@
         android:id="@+id/button"
         android:text="start"
         app:backgroundTint="#FF0000"
-        />
+        android:layout_marginBottom="10dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/score_board_button"
         android:text="Score Board"
         app:backgroundTint="#FF0000"
-        />
+        android:layout_marginBottom="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSignOut"
+        android:text="Log Out"
+        app:backgroundTint="#FF0000"
+        android:visibility="gone" />
 
 </LinearLayout>

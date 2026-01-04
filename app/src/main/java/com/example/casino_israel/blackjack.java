@@ -53,7 +53,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
     private ArrayList<FallingCardChip> winnerChips = new ArrayList<>(); // List of falling chips for the winner animation
     private boolean initialCardsDealt = false; // Flag to ensure initial cards are dealt only once
     private boolean playerTurnEnded = false; // Flag to indicate if the player has finished their turn
-    private boolean winner; // Flag to store if the player won or lost
+    public boolean winner; // Flag to store if the player won or lost
 
     // Animation related fields (only for winner chip now)
     private Handler handler; // Handles messages from the animation thread to update UI
