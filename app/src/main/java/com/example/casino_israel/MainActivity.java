@@ -129,6 +129,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // Re-fetch and display wallet amount when the activity resumes
+            fetchAndDisplayWallet(currentUser.getUid());
+        }
+    }
+
     private void fetchAndDisplayWallet(String userId) {
         fbModule.getPlayerData(userId, new FbModule.PlayerDataCallback() {
             @Override

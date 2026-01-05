@@ -23,6 +23,11 @@ import java.util.ArrayList;
 // The main class for our Blackjack game, extending Android's View to allow custom drawing
 public class blackjack extends View { // TODO: 08/12/2025 making the option to re run the blackjack 
 
+    // Interface to communicate game results back to the hosting Activity
+    public interface GameUpdateListener {
+        void onWalletUpdated(double newWalletAmount);
+    }
+
     // Inner class to hold information about each card circle displayed on the screen
     private class CardCircle {
         PointF position; // The x,y coordinates where the center of the card circle is drawn
@@ -55,6 +60,11 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
     private boolean playerTurnEnded = false; // Flag to indicate if the player has finished their turn
     public boolean winner; // Flag to store if the player won or lost
 
+    // Wallet and User ID variables
+    private String userId; 
+    private double walletAmount;
+    private GameUpdateListener gameUpdateListener;
+
     // Animation related fields (only for winner chip now)
     private Handler handler; // Handles messages from the animation thread to update UI
     private AnimationThread animationThread; // Thread for continuous animation updates
@@ -68,8 +78,11 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
 
 
     // Constructor for the blackjack custom View
-    public blackjack(Context context) {
+    public blackjack(Context context, String userId, double initialWalletAmount, GameUpdateListener listener) {
         super(context);
+        this.userId = userId;
+        this.walletAmount = initialWalletAmount;
+        this.gameUpdateListener = listener;
 
         // Populate the 'cards' ArrayList with standard Blackjack card values
         for (int i = 0; i < 4; i++) { // Four suits
@@ -336,6 +349,10 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 if(playerTurnEnded && CardTotal <= 21 && (CardTotal > dealercardtotal || dealercardtotal > 21)) {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_LONG).show();
                     winner=true;
+                    walletAmount += 10.0; // Add 10 for winning
+                    if (gameUpdateListener != null) {
+                        gameUpdateListener.onWalletUpdated(walletAmount);
+                    }
                     // TODO: 14/12/2025 i think there a problem with the ace and the deeler winning 
 
                     // Trigger winner chip animation
@@ -346,11 +363,15 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 } else if (playerTurnEnded && (CardTotal < dealercardtotal || CardTotal > 21)) {
                     Toast.makeText(getContext(), "you lost", Toast.LENGTH_LONG).show();
                     winner=false;
+                    walletAmount -= 10.0; // Subtract 10 for losing
+                    if (gameUpdateListener != null) {
+                        gameUpdateListener.onWalletUpdated(walletAmount);
+                    }
                     side=false;
                     float centerX = getWidth() / 2f;
                     float centerY = getHeight() * -0.5f; // Target for upward animation (top of the screen)
                     winnerChips.add(new FallingCardChip(winnerChipBitmap, new PointF(centerX, getHeight()), 0, WINNER_CHIP_DROP_SPEED, centerY));
-
+                  
 
                 } else if (CardTotal == dealercardtotal && playerTurnEnded && CardTotal <= 21 && dealercardtotal <= 21) {
                     Toast.makeText(getContext(), "tie", Toast.LENGTH_LONG).show();
