@@ -19,11 +19,18 @@ public class FbModule {
     FirebaseDatabase database;
     Context context;
     ArrayList<players> myRecords;
+
+    // Interface for asynchronous callback when player data is fetched
+    public interface PlayerDataCallback {
+        void onPlayerDataFetched(players player);
+        void onPlayerDataError(DatabaseError error);
+    }
+
     public FbModule(Context context) {
         database = FirebaseDatabase.getInstance("https://casino-finalproject-default-rtdb.firebaseio.com/");
         database = FirebaseDatabase.getInstance();
         this.context = context;
-        this.myRecords = myRecords;
+        this.myRecords = new ArrayList<>(); // Initialize myRecords
 
         // read the records from the Firebase and order them by the record from highest to lowest
         // limit to only 8 items
@@ -54,5 +61,25 @@ public class FbModule {
 
         players rec = new players(id, name, wallet);
         myRef.setValue(rec);
+    }
+
+    public void getPlayerData(String userId, final PlayerDataCallback callback) {
+        DatabaseReference playerRef = database.getReference("records/").child(userId);
+        playerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    players player = snapshot.getValue(players.class);
+                    callback.onPlayerDataFetched(player);
+                } else {
+                    callback.onPlayerDataFetched(null); // Player not found
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onPlayerDataError(error);
+            }
+        });
     }
 }

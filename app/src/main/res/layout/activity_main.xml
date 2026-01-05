@@ -18,6 +18,17 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:textStyle="italic"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"  />
+
+    <TextView
+        android:id="@+id/tvWalletAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wallet: $0.00"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="italic"
         android:layout_marginBottom="16dp"
         android:visibility="gone"  />
 

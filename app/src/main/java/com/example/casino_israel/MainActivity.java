@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView; // Import TextView
+import android.widget.Toast; // Import Toast
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +15,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError; // Import DatabaseError
 import com.example.casino_israel.FbModule; // Import FbModule
+
+import java.text.DecimalFormat; // Import DecimalFormat
 
 public class MainActivity extends AppCompatActivity {
     private Button btn;
@@ -22,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSignOut; // Declare logout button
     private FirebaseAuth mAuth;
     private TextView tvUserEmail; // Declare TextView
+    private TextView tvWalletAmount; // Declare TextView for wallet
     private FbModule fbModule; // Declare FbModule instance
+    private double currentWalletAmount = 0.0; // To store the fetched wallet amount
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
         // Initialize FbModule
         fbModule = new FbModule(this);
 
-        // Initialize TextView and Buttons
+        // Initialize TextViews and Buttons
         tvUserEmail = findViewById(R.id.tvUserEmail);
+        tvWalletAmount = findViewById(R.id.tvWalletAmount); // Initialize tvWalletAmount
         btnSignOut = findViewById(R.id.btnSignOut);
 
         // Check if a user is logged in
@@ -53,12 +60,16 @@ public class MainActivity extends AppCompatActivity {
             SighUp playAgainDialog = new SighUp(MainActivity.this);
             playAgainDialog.show();
             tvUserEmail.setVisibility(View.GONE);
+            tvWalletAmount.setVisibility(View.GONE); // Hide wallet info
             btnSignOut.setVisibility(View.GONE);
         } else {
             // If a user is logged in, display their email and show logout button
             tvUserEmail.setText("Logged in as: " + currentUser.getEmail());
             tvUserEmail.setVisibility(View.VISIBLE);
             btnSignOut.setVisibility(View.VISIBLE);
+
+            // Fetch and display wallet amount
+            fetchAndDisplayWallet(currentUser.getUid());
         }
 
         btn = findViewById(R.id.button);
@@ -89,14 +100,20 @@ public class MainActivity extends AppCompatActivity {
                         userName = "GuestUser"; // Or use userId, but email is preferred for name
                     }
 
-                    double walletamount = 1000.0; // Wallet is 1000.0
+                    // Use the currentWalletAmount fetched or a default if not fetched yet
+                    // For the first time user, default to 1000.0
+                    double walletToSave = currentWalletAmount > 0 ? currentWalletAmount : 1000.0;
 
                     // Call setDetails with correct types and values
-                    fbModule.setDetails(userId, userName, walletamount);
-                }
+                    fbModule.setDetails(userId, userName, walletToSave);
 
-                Intent intent = new Intent(MainActivity.this, BoardGame.class);
-                startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, BoardGame.class);
+                    intent.putExtra("walletAmount", walletToSave); // Pass wallet amount to BoardGame
+                    startActivity(intent);
+                } else {
+                    // If user is not logged in, prevent starting BoardGame or prompt to login
+                    Toast.makeText(MainActivity.this, "Please log in to play.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -108,6 +125,47 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LoginRegister.class);
                 startActivity(intent);
                 finish(); // Close MainActivity so user cannot go back to it with back button
+            }
+        });
+    }
+
+    private void fetchAndDisplayWallet(String userId) {
+        fbModule.getPlayerData(userId, new FbModule.PlayerDataCallback() {
+            @Override
+            public void onPlayerDataFetched(players player) {
+                if (player != null) {
+                    currentWalletAmount = player.getWallet();
+                    DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                    tvWalletAmount.setText("Wallet: $" + decimalFormat.format(currentWalletAmount));
+                    tvWalletAmount.setVisibility(View.VISIBLE);
+                } else {
+                    // Player data not found, possibly a new user, set default wallet
+                    currentWalletAmount = 1000.0;
+                    DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                    tvWalletAmount.setText("Wallet: $" + decimalFormat.format(currentWalletAmount));
+                    tvWalletAmount.setVisibility(View.VISIBLE);
+
+                    // Also, create a new record in Firebase for this user with default wallet
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    if (currentUser != null) {
+                        String userName = "";
+                        String userEmail = currentUser.getEmail();
+                        if (userEmail != null && userEmail.contains("@")) {
+                            userName = userEmail.substring(0, userEmail.indexOf("@"));
+                        } else if (userEmail != null) {
+                            userName = userEmail;
+                        } else {
+                            userName = "GuestUser";
+                        }
+                        fbModule.setDetails(currentUser.getUid(), userName, currentWalletAmount);
+                    }
+                }
+            }
+
+            @Override
+            public void onPlayerDataError(DatabaseError error) {
+                Toast.makeText(MainActivity.this, "Failed to load wallet: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                tvWalletAmount.setVisibility(View.GONE); // Hide wallet on error
             }
         });
     }
