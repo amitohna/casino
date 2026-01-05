@@ -161,10 +161,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 {
                     IsAce=true;
                 }
-                else
-                {
-                    IsAce=false;
-                }
+
                 cards.remove(randomIndex); // Remove the card from the deck
 
                 // Calculate final position for player's new card circle
@@ -349,7 +346,13 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 if(playerTurnEnded && CardTotal <= 21 && (CardTotal > dealercardtotal || dealercardtotal > 21)) {
                     Toast.makeText(getContext(), "you won", Toast.LENGTH_LONG).show();
                     winner=true;
-                    walletAmount += 10.0; // Add 10 for winning
+                    if(CardTotal==21&&count==2){
+                        walletAmount+=15.0;
+                    }
+                    else {
+                        walletAmount += 10.0; // Add 10 for winning
+                    }
+
                     if (gameUpdateListener != null) {
                         gameUpdateListener.onWalletUpdated(walletAmount);
                     }

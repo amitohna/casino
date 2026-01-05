@@ -67,11 +67,17 @@ public class BoardGame extends AppCompatActivity {
         blackJackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                game = true;
-                Intent intent = new Intent(BoardGame.this, ActivityGames.class);
-                intent.putExtra("game", game);
-                intent.putExtra("walletAmount", currentWalletAmount); // Pass the updated wallet to ActivityGames
-                startActivity(intent);
+
+                if (currentWalletAmount>=10.0){
+                    game = true;
+                    Intent intent = new Intent(BoardGame.this, ActivityGames.class);
+                    intent.putExtra("game", game);
+                    intent.putExtra("walletAmount", currentWalletAmount); // Pass the updated wallet to ActivityGames
+                    startActivity(intent);
+                }
+                else
+                    Toast.makeText(BoardGame.this, "you don't have enough money", Toast.LENGTH_LONG).show();
+
             }
         });
 
