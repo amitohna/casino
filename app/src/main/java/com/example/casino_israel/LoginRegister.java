@@ -47,7 +47,7 @@ public class LoginRegister extends AppCompatActivity implements View.OnClickList
         super.onStart();
         isLogin=false;
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser(); // TODO: 31/12/2025 is it saving ok but doesnt sync we the fire base and need to fix the dialog 
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
             reload();
         }

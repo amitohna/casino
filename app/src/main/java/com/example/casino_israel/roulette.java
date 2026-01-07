@@ -14,7 +14,7 @@ public class roulette extends View {
 
     public roulette(Context context) {
         super(context);
-        backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.rollette);
+        backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.roulette);
 
     }
     @Override // It's good practice to use @Override for overridden methods
