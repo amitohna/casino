@@ -174,6 +174,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 if(IsAce&&CardTotal>21)
                 {
                     CardTotal-=10;
+                    IsAce=false;
                 }
                 count++; // Increment player's card count
             }
@@ -185,10 +186,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             {
                 IsAceDealer=true;
             }
-            else
-            {
-                IsAceDealer=false;
-            }
+
             cards.remove(dealerRandomIndex);
 
             // Calculate final position for dealer's new card circle
@@ -201,6 +199,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             if(IsAceDealer&&dealercardtotal>21)
             {
                 dealercardtotal-=10;
+                IsAceDealer=false;
             }
 
 

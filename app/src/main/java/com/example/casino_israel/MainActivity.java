@@ -1,6 +1,7 @@
 package com.example.casino_israel;
 
 import android.content.Intent;
+import android.media.MediaPlayer; // Import MediaPlayer
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvWalletAmount; // Declare TextView for wallet
     private FbModule fbModule; // Declare FbModule instance
     private double currentWalletAmount = 0.0; // To store the fetched wallet amount
+    private MediaPlayer mediaPlayer; // Declare MediaPlayer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        // Initialize MediaPlayer
+        mediaPlayer = MediaPlayer.create(this, R.raw.gamble); // Now using R.drawable.gamble
+        if (mediaPlayer != null) {
+
+            mediaPlayer.start(); // Start playing the music
+        }
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -137,6 +146,30 @@ public class MainActivity extends AppCompatActivity {
             // Re-fetch and display wallet amount when the activity resumes
             fetchAndDisplayWallet(currentUser.getUid());
         }
+
+        // Resume music if it was paused
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when the activity is paused
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Release MediaPlayer resources when the activity is destroyed
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     private void fetchAndDisplayWallet(String userId) {
@@ -164,8 +197,6 @@ public class MainActivity extends AppCompatActivity {
                             userName = userEmail.substring(0, userEmail.indexOf("@"));
                         } else if (userEmail != null) {
                             userName = userEmail;
-                        } else {
-                            userName = "GuestUser";
                         }
                         fbModule.setDetails(currentUser.getUid(), userName, currentWalletAmount);
                     }
