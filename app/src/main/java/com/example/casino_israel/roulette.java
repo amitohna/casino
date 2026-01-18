@@ -77,7 +77,6 @@ public class roulette extends View {
 
             // Draw the roulette wheel bitmap
             canvas.drawBitmap(rouletteWheelImage, null, wheelDestRect, paint);
-
             canvas.restore(); // Restore the canvas to its original state
         }
     }
