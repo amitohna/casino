@@ -9,6 +9,9 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
+
+import java.util.Random;
 
 public class roulette extends View {
     private Bitmap backgroundImage;
@@ -17,6 +20,8 @@ public class roulette extends View {
     private float currentWheelRotation = 0; // Tracks current rotation of the wheel
     private boolean isSpinning = false;
     private Handler handler = new Handler();
+    private Random random = new Random();
+    private int resulet;
 
     // Define the destination rectangle for drawing the roulette wheel
     private Rect wheelDestRect;
@@ -27,7 +32,7 @@ public class roulette extends View {
         backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.roulletes);
         // Load the roulette wheel image
         rouletteWheelImage = BitmapFactory.decodeResource(getResources(), R.drawable.rol90);
-
+        resulet = random.nextInt(38);
     }
 
     @Override
@@ -39,7 +44,7 @@ public class roulette extends View {
             int wheelSize = (int) (Math.min(getWidth(), getHeight()) * 0.6); // Use the smaller dimension to keep aspect ratio, and 60% of it.
             
             int left = ((getWidth() - wheelSize/2) / 2); // Center horizontally
-            int top = (int) (getHeight() * 0.01); // Position it about 10% from the top
+            int top = (int) (getHeight() * 0.01); // Position it about 1% from the top
             int right = left + wheelSize;
             int bottom = top + wheelSize; // Make it square
             wheelDestRect = new Rect(left, top, right, bottom);
@@ -94,6 +99,8 @@ public class roulette extends View {
                 invalidate();
                 handler.postDelayed(this, 20); // Delay for animation
             } else {
+                // Fix: convert integer to String to prevent Resources$NotFoundException crash
+                Toast.makeText(getContext(), "Number is: " + resulet, Toast.LENGTH_LONG).show();
                 isSpinning = false;
                 rotatedSoFar = 0;
             }
@@ -103,13 +110,16 @@ public class roulette extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
             float touchX = event.getX();
             float touchY = event.getY();
 
                // Check if the touch event is within the bounds of the roulette wheel
                if (!isSpinning && wheelDestRect != null && wheelDestRect.contains((int) touchX, (int) touchY)) {
                    isSpinning = true;
+                   resulet = random.nextInt(38); // Randomize result on each spin
                    handler.post(spinRunnable);
+
                    return true; // Event handled
                }
 
