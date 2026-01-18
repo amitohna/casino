@@ -266,6 +266,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 return true;
             }
 
+
             // Define the approximate area for the "HIT" button on the screen
             float hitAreaLeft = getWidth() * 0.25f;
             float hitAreaRight = getWidth() * 0.75f;
