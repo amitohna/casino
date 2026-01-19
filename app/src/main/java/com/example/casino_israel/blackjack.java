@@ -274,7 +274,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
             float hitAreaBottom = getHeight();
 
             // Check if the touch is inside the "HIT" button area AND it's player's turn, and conditions allow hitting
-            if (!playerTurnEnded && CardTotal < 21 && count < 5 &&
+            if (!playerTurnEnded && (CardTotal < 21||IsAce) && count < 5 &&
                     (touchX >= hitAreaLeft && touchX <= hitAreaRight && touchY >= hitAreaTop && touchY <= hitAreaBottom)) {
                 
                 int randomIndex = random.nextInt(cards.size()); // Get a random card index
@@ -283,10 +283,7 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
                 {
                     IsAce=true;
                 }
-                else
-                {
-                    IsAce=false;
-                }
+
                 cards.remove(randomIndex); // Remove the card from the deck
 
                 // Calculate final position for player's new card circle
