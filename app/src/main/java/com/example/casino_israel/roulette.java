@@ -266,26 +266,26 @@ public class roulette extends View {
         for (PlacedBet bet : placedBets) {
             String name = bet.area.name;
             // Check direct number hits
-            if (name.equals(String.valueOf(resultNumber))) return true;
-            if (name.equals("0") && resultNumber == 0) return true;
-            if (name.equals("00") && resultNumber == 37) return true;
+            if (name.equals(String.valueOf(resultNumber)))  {walletAmount+=360; return true; }
+            if (name.equals("0") && resultNumber == 0) {walletAmount+=360; return true; }
+            if (name.equals("00") && resultNumber == 37) {walletAmount+=360; return true; }
             
             // Skip range checks if result is 0 or 00 (unless specifically bet on)
             if (resultNumber == 0 || resultNumber == 37) continue;
 
             // Check range and category bets
-            if (name.equals("RED") && RED_NUMBERS.contains(resultNumber)) return true;
-            if (name.equals("BLACK") && !RED_NUMBERS.contains(resultNumber)) return true;
-            if (name.equals("EVEN") && resultNumber % 2 == 0) return true;
-            if (name.equals("ODD") && resultNumber % 2 != 0) return true;
-            if (name.equals("1-18") && resultNumber <= 18) return true;
-            if (name.equals("19-36") && resultNumber >= 19) return true;
-            if (name.equals("1st 12") && resultNumber <= 12) return true;
-            if (name.equals("2nd 12") && resultNumber >= 13 && resultNumber <= 24) return true;
-            if (name.equals("3rd 12") && resultNumber >= 25) return true;
-            if (name.equals("Col 1") && resultNumber % 3 == 1) return true;
-            if (name.equals("Col 2") && resultNumber % 3 == 2) return true;
-            if (name.equals("Col 3") && resultNumber % 3 == 0) return true;
+            if (name.equals("RED") && RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; return true; }
+            if (name.equals("BLACK") && !RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; return true; }
+            if (name.equals("EVEN") && resultNumber % 2 == 0) {walletAmount+=20; return true; }
+            if (name.equals("ODD") && resultNumber % 2 != 0) {walletAmount+=20; return true; }
+            if (name.equals("1-18") && resultNumber <= 18) {walletAmount+=20; return true; }
+            if (name.equals("19-36") && resultNumber >= 19) {walletAmount+=20; return true; }
+            if (name.equals("1st 12") && resultNumber <= 12) {walletAmount+=30; return true; }
+            if (name.equals("2nd 12") && resultNumber >= 13 && resultNumber <= 24) {walletAmount+=30; return true; }
+            if (name.equals("3rd 12") && resultNumber >= 25) {walletAmount+=30; return true; }
+            if (name.equals("Col 1") && resultNumber % 3 == 1) {walletAmount+=30; return true; }
+            if (name.equals("Col 2") && resultNumber % 3 == 2) {walletAmount+=30; return true; }
+            if (name.equals("Col 3") && resultNumber % 3 == 0) {walletAmount+=30; return true; }
         }
         return false;
     }
@@ -332,6 +332,10 @@ public class roulette extends View {
                 if (area.bounds.contains(touchX, touchY)) {
                     // Snap chip to the center of the box for a clean appearance
                     placedBets.add(new PlacedBet(new PointF(area.bounds.centerX(), area.bounds.centerY()), area));
+                    walletAmount -= 10.0; // Subtract 10 for losing
+                    if (gameUpdateListener != null) {
+                        gameUpdateListener.onWalletUpdated(walletAmount);
+                    }
                     invalidate();
                     return true;
                 }
