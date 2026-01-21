@@ -43,14 +43,14 @@ public class ActivityGames extends AppCompatActivity implements blackjack.GameUp
             return;
         }
 
-        if (check == true) {
+        if (check) {
             // Pass userId, walletAmount, and GameUpdateListener to blackjack
             blackjack blackjackView = new blackjack(this, currentUserId, currentWalletAmount, this);
             setContentView(blackjackView);
         }
-        if (check == false) {
+        if (!check) {
             // Pass userId, walletAmount, and GameUpdateListener to roulette (future)
-            roulette rouletteView = new roulette(this);
+            roulette rouletteView = new roulette(this, currentUserId, currentWalletAmount, this);
             setContentView(rouletteView);
         }
 

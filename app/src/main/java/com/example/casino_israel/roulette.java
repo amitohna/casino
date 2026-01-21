@@ -44,6 +44,10 @@ public class roulette extends View {
     private Rect wheelDestRect; // Area where the spinning wheel is drawn
     private List<PlacedBet> placedBets = new ArrayList<>(); // Stores currently active bets on the table
     private List<BetArea> betAreas = new ArrayList<>(); // Definitions of all clickable boxes on the table
+    private String userId;
+    private double walletAmount;
+    private blackjack.GameUpdateListener gameUpdateListener;
+    private Paint textPaint; // Paint for wallet text
 
     // Set of red numbers for quick win/color lookup
     private static final Set<Integer> RED_NUMBERS = new HashSet<>(Arrays.asList(
@@ -76,13 +80,24 @@ public class roulette extends View {
         }
     }
 
-    // Constructor: Load images and initialize random state
-    public roulette(Context context) {
+    // Constructor: Load images and initialize state
+    public roulette(Context context, String userId, double initialWalletAmount, blackjack.GameUpdateListener listener) {
         super(context);
+        this.userId = userId;
+        this.walletAmount = initialWalletAmount;
+        this.gameUpdateListener = listener;
+        
         backgroundImage = BitmapFactory.decodeResource(getResources(), R.drawable.roulletes);
         rouletteWheelImage = BitmapFactory.decodeResource(getResources(), R.drawable.rol90);
         chipImage = BitmapFactory.decodeResource(getResources(), R.drawable.chip);
         resulet = random.nextInt(38);
+
+        // Initialize Paint for drawing text
+        textPaint = new Paint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(50);
+        textPaint.setAntiAlias(true);
+        textPaint.setFakeBoldText(true);
     }
 
     // Called when the view changes size (app start or rotation)
@@ -192,6 +207,10 @@ public class roulette extends View {
                 canvas.drawBitmap(chipImage, null, chipRect, paint);
             }
         }
+
+        // 4. Draw Wallet Amount
+        String walletText = "Wallet: $" + String.format("%.2f", walletAmount);
+        canvas.drawText(walletText, 30, 80, textPaint);
     }
 
     /**
@@ -218,6 +237,19 @@ public class roulette extends View {
             } else {
                 // Spin finished: Check bets, show result, and clear board
                 boolean won = checkWin(resulet);
+                
+                // Update wallet: +10 for a win, -10 for a loss
+                if (won) {
+                    walletAmount += 10.0;
+                } else {
+                    walletAmount -= 10.0;
+                }
+                
+                // Notify listener (ActivityGames) to save to Firebase
+                if (gameUpdateListener != null) {
+                    gameUpdateListener.onWalletUpdated(walletAmount);
+                }
+
                 showColoredResult(resulet, won);
                 isSpinning = false;
                 rotatedSoFar = 0;
