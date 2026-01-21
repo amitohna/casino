@@ -53,6 +53,7 @@ public class roulette extends View {
     private static final Set<Integer> RED_NUMBERS = new HashSet<>(Arrays.asList(
             1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
     ));
+    private boolean lost=false;
 
     /**
      * Inner class representing a clickable betting area on the table.
@@ -238,12 +239,13 @@ public class roulette extends View {
                 // Spin finished: Check bets, show result, and clear board
                 boolean won = checkWin(resulet);
                 
-                // Update wallet: +10 for a win, -10 for a loss
-                if (won) {
-                    walletAmount += 10.0;
-                } else {
-                    walletAmount -= 10.0;
+                // Update wallet: -10*the amount of bet, for a loss
+                if (!won) {
+                    walletAmount -= 10.0*placedBets.size();
                 }
+
+
+
                 
                 // Notify listener (ActivityGames) to save to Firebase
                 if (gameUpdateListener != null) {
@@ -265,6 +267,7 @@ public class roulette extends View {
     private boolean checkWin(int resultNumber) {
         for (PlacedBet bet : placedBets) {
             String name = bet.area.name;
+
             // Check direct number hits
             if (name.equals(String.valueOf(resultNumber)))  {walletAmount+=360; return true; }
             if (name.equals("0") && resultNumber == 0) {walletAmount+=360; return true; }
@@ -324,6 +327,7 @@ public class roulette extends View {
                 isSpinning = true;
                 resulet = random.nextInt(38); // Determine winning number at start of spin
                 handler.post(spinRunnable);
+
                 return true;
             }
 
@@ -332,7 +336,16 @@ public class roulette extends View {
                 if (area.bounds.contains(touchX, touchY)) {
                     // Snap chip to the center of the box for a clean appearance
                     placedBets.add(new PlacedBet(new PointF(area.bounds.centerX(), area.bounds.centerY()), area));
-                    walletAmount -= 10.0; // Subtract 10 for losing
+                   /* if(!lost)
+                    {
+
+                        walletAmount -= 10.0; // Subtract 10 for losing
+                       lost=true;
+                    }
+                    else
+                    {
+                        lost=false;
+                    }*/
                     if (gameUpdateListener != null) {
                         gameUpdateListener.onWalletUpdated(walletAmount);
                     }
