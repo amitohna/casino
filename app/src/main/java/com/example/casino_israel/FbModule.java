@@ -27,28 +27,41 @@ public class FbModule {
     }
 
     public FbModule(Context context) {
-        database = FirebaseDatabase.getInstance("https://casino-finalproject-default-rtdb.firebaseio.com/");
+        // Use the default instance. The URL is usually configured in google-services.json
         database = FirebaseDatabase.getInstance();
         this.context = context;
-        this.myRecords = new ArrayList<>(); // Initialize myRecords
 
-        // read the records from the Firebase and order them by the record from highest to lowest
-        // limit to only 8 items
-        Query myQuery = database.getReference("records").orderByChild("score").limitToLast(8);
+        // Read records from Firebase, order them by 'wallet' from highest to lowest,
+        // and limit to the last 8 items. Using 'wallet' as per your players class.
+        Query myQuery = database.getReference("records").orderByChild("wallet").limitToLast(8);
         myQuery.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-              /*  myRecords.clear();  // clear the array list
-                for(DataSnapshot userSnapshot : snapshot.getChildren())
-                {
-                    players currentMyRecord =userSnapshot.getValue(players.class);
-                    myRecords.add(0, currentMyRecord);
-                }*/
+                // FIX: Check if Scoreboard.records is initialized to prevent NullPointerException.
+                // It's only guaranteed to be initialized when Scoreboard activity is active.
+                if (Scoreboard.records != null) {
+                    Scoreboard.records.clear();  // Clear the array list for new data
+                    for(DataSnapshot userSnapshot : snapshot.getChildren())
+                    {
+                        players currentMyRecord = userSnapshot.getValue(players.class);
+                        // Add a null check for currentMyRecord in case of data inconsistencies
+                        if (currentMyRecord != null) {
+                            // Add to the beginning of the list to get highest scores first
+                            Scoreboard.records.add(0, currentMyRecord);
+                        }
+                    }
+
+                    // If the current context is a Scoreboard activity, notify it to refresh its UI.
+                    if (context instanceof Scoreboard) {
+                        ((Scoreboard) context).dataChange(); // Assuming Scoreboard has a public dataChange method
+                    }
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                // Handle potential errors during data fetching
+                // You might want to log this error or show a Toast.
             }
         });
 
@@ -56,9 +69,8 @@ public class FbModule {
 
     public void setDetails(String id, String name, double wallet)
     {
-        // Write a message to the database
+        // Write a message to the database for a specific user ID
         DatabaseReference myRef = database.getReference("records/" + id);
-
         players rec = new players(id, name, wallet);
         myRef.setValue(rec);
     }
@@ -69,15 +81,18 @@ public class FbModule {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    // If player data exists, convert it to a 'players' object
                     players player = snapshot.getValue(players.class);
                     callback.onPlayerDataFetched(player);
                 } else {
-                    callback.onPlayerDataFetched(null); // Player not found
+                    // If no data found for the player, return null
+                    callback.onPlayerDataFetched(null);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Handle potential errors during data fetching
                 callback.onPlayerDataError(error);
             }
         });

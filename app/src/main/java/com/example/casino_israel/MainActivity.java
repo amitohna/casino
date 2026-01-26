@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError; // Import DatabaseError
 import com.example.casino_israel.FbModule; // Import FbModule
 
 import java.text.DecimalFormat; // Import DecimalFormat
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Button btn;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private FbModule fbModule; // Declare FbModule instance
     private double currentWalletAmount = 0.0; // To store the fetched wallet amount
     private MediaPlayer mediaPlayer; // Declare MediaPlayer
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
