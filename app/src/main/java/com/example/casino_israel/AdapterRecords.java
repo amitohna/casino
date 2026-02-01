@@ -30,6 +30,7 @@ public class AdapterRecords extends RecyclerView.Adapter<AdapterRecords.UserView
         //inflating and returning our view holder
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.custom_layout, null);
+
         return new UserViewHolder(view);
     }
 

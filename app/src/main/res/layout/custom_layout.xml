@@ -30,7 +30,7 @@
             android:textSize="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
-            android:textColor="#F44336"
+            android:textColor="@color/white"
             />
     </LinearLayout>
     <LinearLayout
@@ -51,11 +51,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+
             android:id="@+id/tvScore"
             android:textSize="20dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
-            android:textColor="#F44336"
+            android:textColor="@color/white"
             />
     </LinearLayout>
 
