@@ -31,6 +31,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:textColor="@color/white"
+
             />
     </LinearLayout>
     <LinearLayout
