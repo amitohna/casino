@@ -43,7 +43,7 @@ public class FbModule {
                     Scoreboard.records.clear();  // Clear the array list for new data
                     for(DataSnapshot userSnapshot : snapshot.getChildren())
                     {
-                        players currentMyRecord = userSnapshot.getValue(players.class);
+                         players currentMyRecord = userSnapshot.getValue(players.class);
                         // Add a null check for currentMyRecord in case of data inconsistencies
                         if (currentMyRecord != null) {
                             // Add to the beginning of the list to get highest scores first
