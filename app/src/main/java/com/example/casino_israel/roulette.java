@@ -240,9 +240,9 @@ public class roulette extends View {
                 boolean won = checkWin(resulet);
                 
                 // Update wallet: -10*the amount of bet, for a loss
-                if (!won) {
+               // if (!won) {
                     walletAmount -= 10.0*placedBets.size();
-                }
+               // }
 
 
 
@@ -267,7 +267,7 @@ public class roulette extends View {
     private boolean checkWin(int resultNumber) {
         for (PlacedBet bet : placedBets) {
             String name = bet.area.name;
-
+            //walletAmount -= 5.0;
             // Check direct number hits
             if (name.equals(String.valueOf(resultNumber)))  {walletAmount+=360; return true; }
             if (name.equals("0") && resultNumber == 0) {walletAmount+=360; return true; }
@@ -336,6 +336,7 @@ public class roulette extends View {
                 if (area.bounds.contains(touchX, touchY)) {
                     // Snap chip to the center of the box for a clean appearance
                     placedBets.add(new PlacedBet(new PointF(area.bounds.centerX(), area.bounds.centerY()), area));
+
                    /* if(!lost)
                     {
 
