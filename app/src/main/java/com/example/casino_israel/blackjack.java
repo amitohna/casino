@@ -241,6 +241,9 @@ public class blackjack extends View { // TODO: 08/12/2025 making the option to r
         for (FallingCardChip chip : winnerChips) {
             chip.draw(canvas, drawingPaint);
         }
+        // Draw Wallet Amount
+        String walletText = "Wallet: $" + String.format("%.2f", walletAmount);
+        canvas.drawText(walletText, 199, 400, drawingPaint);
     }
 
     @Override
