@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Your custom drawing view (overridden onDraw(canvas)) -->
+    <com.example.casino_israel.blackjack
+        android:id="@+id/myCanvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <com.example.casino_israel.roulette
+        android:id="@+id/myCanvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Overlay EditText (initial position can be adjusted in code) -->
+    <EditText
+        android:id="@+id/overlayEdit"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Type here"
+        android:background="@android:drawable/edit_text" />
+</FrameLayout>
