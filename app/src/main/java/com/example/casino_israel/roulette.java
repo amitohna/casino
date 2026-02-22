@@ -54,6 +54,7 @@ public class roulette extends View {
             1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36
     ));
     private boolean lost=false;
+    private int count=0;
 
     /**
      * Inner class representing a clickable betting area on the table.
@@ -242,6 +243,7 @@ public class roulette extends View {
                 // Update wallet: -10*the amount of bet, for a loss
                // if (!won) {
                     walletAmount -= 10.0*placedBets.size();
+                    walletAmount+=10.0*count;
                // }
 
 
@@ -277,18 +279,23 @@ public class roulette extends View {
             if (resultNumber == 0 || resultNumber == 37) continue;
 
             // Check range and category bets
-            if (name.equals("RED") && RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; return true; }
-            if (name.equals("BLACK") && !RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; return true; }
-            if (name.equals("EVEN") && resultNumber % 2 == 0) {walletAmount+=20; return true; }
-            if (name.equals("ODD") && resultNumber % 2 != 0) {walletAmount+=20; return true; }
-            if (name.equals("1-18") && resultNumber <= 18) {walletAmount+=20; return true; }
-            if (name.equals("19-36") && resultNumber >= 19) {walletAmount+=20; return true; }
-            if (name.equals("1st 12") && resultNumber <= 12) {walletAmount+=30; return true; }
-            if (name.equals("2nd 12") && resultNumber >= 13 && resultNumber <= 24) {walletAmount+=30; return true; }
-            if (name.equals("3rd 12") && resultNumber >= 25) {walletAmount+=30; return true; }
-            if (name.equals("Col 1") && resultNumber % 3 == 1) {walletAmount+=30; return true; }
-            if (name.equals("Col 2") && resultNumber % 3 == 2) {walletAmount+=30; return true; }
-            if (name.equals("Col 3") && resultNumber % 3 == 0) {walletAmount+=30; return true; }
+            if (name.equals("RED") && RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; count++; }
+            if (name.equals("BLACK") && !RED_NUMBERS.contains(resultNumber)) {walletAmount+=20; count++; }
+            if (name.equals("EVEN") && resultNumber % 2 == 0) {walletAmount+=20; count++; }
+            if (name.equals("ODD") && resultNumber % 2 != 0) {walletAmount+=20; count++; }
+            if (name.equals("1-18") && resultNumber <= 18) {walletAmount+=20; count++; }
+            if (name.equals("19-36") && resultNumber >= 19) {walletAmount+=20; count++; }
+            if (name.equals("1st 12") && resultNumber <= 12) {walletAmount+=30; count++;  }
+            if (name.equals("2nd 12") && resultNumber >= 13 && resultNumber <= 24) {walletAmount+=30; count++; }
+            if (name.equals("3rd 12") && resultNumber >= 25) {walletAmount+=30; count++; }
+            if (name.equals("Col 1") && resultNumber % 3 == 1) {walletAmount+=30; count++;; }
+            if (name.equals("Col 2") && resultNumber % 3 == 2) {walletAmount+=30; count++; }
+            if (name.equals("Col 3") && resultNumber % 3 == 0) {walletAmount+=30; count++; }
+            if(count>0)
+            {
+                count=0;
+                return true;
+            }
         }
         return false;
     }
