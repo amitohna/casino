@@ -6,11 +6,11 @@
 
     <!-- Your custom drawing view (overridden onDraw(canvas)) -->
     <com.example.casino_israel.blackjack
-        android:id="@+id/myCanvas"
+        android:id="@+id/jack"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <com.example.casino_israel.roulette
-        android:id="@+id/myCanvas"
+        android:id="@+id/lette"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
